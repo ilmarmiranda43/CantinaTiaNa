@@ -1,0 +1,11 @@
+.env
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+cantina.db
+whatsapp-service/.env
+whatsapp-service/node_modules/
+npm-debug.log*
+

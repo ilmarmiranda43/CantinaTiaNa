@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Compras de {{ aluno.nome }}{% endblock %}
+{% block content %}
+<div class="mb-3">
+    <h1 class="h2 mb-1">Compras de {{ aluno.nome }}</h1>
+    <p class="text-muted mb-0">{{ aluno.serie }} · Responsável: {{ aluno.responsavel.nome }}</p>
+</div>
+{% for compra in compras %}
+<div class="card shadow-sm mb-3">
+    <div class="card-header d-flex justify-content-between"><span>{{ compra.data.strftime('%d/%m/%Y %H:%M')
+            }}</span><strong>{{ compra.valor_total|brl }}</strong></div>
+    <div class="card-body">
+        {% if compra.itens %}<ul class="list-group list-group-flush">{% for item in compra.itens %}<li
+                class="list-group-item d-flex justify-content-between px-0"><span>{{ item.produto.nome }} × {{
+                    item.quantidade }}</span><span>{{ item.subtotal|brl }}</span></li>{% endfor %}</ul>{% else %}<span
+            class="text-muted">Sem itens detalhados.</span>{% endif %}
+    </div>
+</div>
+{% else %}<div class="alert alert-secondary">Nenhuma compra registrada para este aluno.</div>{% endfor %}
+<a class="btn btn-outline-secondary" href="/relatorios">Voltar</a>
+{% endblock %}

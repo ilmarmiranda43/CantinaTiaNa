@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+{% block title %}WhatsApp{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+  <div>
+    <h1 class="h2 mb-1">WhatsApp</h1>
+    <p class="text-muted mb-0">Envie mensagens somente para destinatários autorizados.</p>
+  </div>
+  <span
+    class="badge fs-6 {% if status and status.conectado %}text-bg-success{% elif status and status.status == 'aguardando_qr' %}text-bg-warning{% else %}text-bg-secondary{% endif %}"
+    id="connection-badge">{{ status.status|replace('_',' ') if status else 'indisponível' }}</span>
+</div>
+{% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+{% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+{% if service_error %}<div class="alert alert-warning"><strong>Serviço indisponível:</strong> {{ service_error }}</div>
+{% endif %}
+
+{% if is_admin %}
+<section class="card shadow-sm mb-4">
+  <div class="card-body">
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+      <div>
+        <h2 class="h5">Conexão do WhatsApp</h2>
+        <p class="text-muted mb-0" id="connection-text">{% if status and status.conectado %}Conectado{% if
+          status.telefone %} como <strong>{{ status.telefone }}</strong>{% endif %}{% else %}Clique em conectar para
+          gerar ou atualizar o QR Code.{% endif %}</p>
+      </div>
+      <form method="post" action="/whatsapp/connect"><input type="hidden" name="csrf_token"
+          value="{{ csrf_token }}"><button class="btn btn-outline-success" type="submit">{% if status and
+          status.conectado %}Verificar conexão{% else %}Conectar WhatsApp{% endif %}</button></form>
+    </div>
+    <div class="text-center mt-4 {% if not status or status.conectado or not status.qr_code %}d-none{% endif %}"
+      id="qr-container">
+      <img src="{{ status.qr_code if status and status.qr_code else '' }}" class="whatsapp-qr" id="qr-image"
+        alt="QR Code para conectar o WhatsApp">
+      <p class="small text-muted mt-2 mb-0">WhatsApp → Aparelhos conectados → Conectar aparelho.</p>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<section class="card shadow-sm mb-4">
+  <div class="card-body">
+    <h2 class="h5 mb-3">Nova mensagem</h2>
+    <form method="post" action="/whatsapp/send"><input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <div class="row g-3">
+        <div class="col-12">
+          <label class="form-label">Tipo de mensagem</label>
+          <select class="form-select" name="tipo_mensagem" id="message-type">
+            <option value="livre" {% if values.get('tipo_mensagem')=='livre' %}selected{% endif %}>Mensagem livre
+            </option>
+            <option value="resumo_compras" {% if values.get('tipo_mensagem')=='resumo_compras' %}selected{% endif %}>
+              Lista de compras do aluno</option>
+          </select>
+        </div>
+        <div class="col-md-6"><label class="form-label">Responsável</label><select class="form-select"
+            name="responsavel_id" id="responsavel-select">
+            <option value="">Digitar outro telefone</option>{% for r in responsaveis %}<option value="{{ r.id }}" {% if
+              values.get('responsavel_id')|string==r.id|string %}selected{% endif %}>{{ r.nome }} — {{ r.fone }}
+            </option>{% endfor %}
+          </select>
+          <div class="form-text">Ao selecionar, o telefone cadastrado será utilizado.</div>
+        </div>
+        <div class="col-md-6"><label class="form-label">Telefone</label><input class="form-control" name="telefone"
+            id="phone-input" value="{{ values.get('telefone','') }}" placeholder="(11) 99999-9999"></div>
+        <div class="col-12" id="purchase-summary-fields">
+          <div class="row g-3">
+            <div class="col-md-7">
+              <label class="form-label">Aluno do responsável</label>
+              <select class="form-select" name="aluno_id" id="student-select">
+                <option value="">Selecione o aluno</option>
+                {% for aluno in alunos %}
+                <option value="{{ aluno.id }}" data-responsavel-id="{{ aluno.responsavel_id }}" {% if
+                  values.get('aluno_id')|string==aluno.id|string %}selected{% endif %}>
+                  {{ aluno.nome }} — {{ aluno.serie }}
+                </option>
+                {% endfor %}
+              </select>
+              <div class="form-text" id="student-help">Primeiro selecione o responsável.</div>
+            </div>
+            <div class="col-md-5">
+              <label class="form-label">Mês das compras</label>
+              <input class="form-control" type="month" name="mes_referencia" id="reference-month"
+                value="{{ values.get('mes_referencia','') }}">
+            </div>
+            <div class="col-12">
+              <button class="btn btn-outline-primary" type="button" id="preview-purchases">
+                Gerar prévia das compras
+              </button>
+              <span class="small text-muted ms-2" id="preview-status"></span>
+            </div>
+          </div>
+        </div>
+        <div class="col-12"><label class="form-label">Mensagem</label><textarea class="form-control" name="mensagem"
+            id="message-text" rows="10" maxlength="4096">{{ values.get('mensagem','') }}</textarea>
+          <div class="form-text" id="message-help">Digite a mensagem que será enviada.</div>
+        </div>
+      </div>
+      <button class="btn btn-success mt-3" type="submit" {% if not status or not status.conectado %}disabled{% endif
+        %}>Enviar mensagem</button>{% if not status or not status.conectado %}<small class="text-muted ms-2">O WhatsApp
+        precisa estar conectado.</small>{% endif %}
+    </form>
+  </div>
+</section>
+
+<section class="card shadow-sm">
+  <div class="card-body">
+    <h2 class="h5 mb-3">Últimos envios</h2>
+    {% if history %}<div class="table-responsive">
+      <table class="table table-sm align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Destinatário</th>
+            <th>Telefone</th>
+            <th>Usuário</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in history %}<tr>
+            <td>{{ item.criado_em.strftime('%d/%m/%Y %H:%M') }}</td>
+            <td>{{ item.responsavel.nome if item.responsavel else 'Telefone informado' }}</td>
+            <td>{{ item.telefone }}</td>
+            <td>{{ item.usuario_nome }}</td>
+            <td><span
+                class="badge {% if item.status == 'Enviada' %}text-bg-success{% elif item.status == 'Erro' %}text-bg-danger{% else %}text-bg-secondary{% endif %}">{{
+                item.status }}</span>{% if item.detalhes_erro %}<div class="small text-danger">{{ item.detalhes_erro }}
+              </div>{% endif %}</td>
+          </tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>{% else %}<p class="text-muted mb-0">Nenhuma mensagem registrada.</p>{% endif %}
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+  (() => {
+    const messageType = document.querySelector('#message-type');
+    const responsavel = document.querySelector('#responsavel-select');
+    const phone = document.querySelector('#phone-input');
+    const fields = document.querySelector('#purchase-summary-fields');
+    const student = document.querySelector('#student-select');
+    const studentHelp = document.querySelector('#student-help');
+    const month = document.querySelector('#reference-month');
+    const preview = document.querySelector('#preview-purchases');
+    const previewStatus = document.querySelector('#preview-status');
+    const message = document.querySelector('#message-text');
+    const messageHelp = document.querySelector('#message-help');
+
+    function filterStudents() {
+      const responsibleId = responsavel.value;
+      let visible = 0;
+      for (const option of student.options) {
+        if (!option.value) continue;
+        const matches = option.dataset.responsavelId === responsibleId;
+        option.hidden = !matches;
+        option.disabled = !matches;
+        if (matches) visible++;
+      }
+      const selected = student.options[student.selectedIndex];
+      if (selected?.value && selected.dataset.responsavelId !== responsibleId) {
+        student.value = '';
+      }
+      studentHelp.textContent = !responsibleId
+        ? 'Primeiro selecione o responsável.'
+        : visible
+          ? `${visible} aluno(s) vinculado(s) a este responsável.`
+          : 'Este responsável não possui alunos vinculados.';
+    }
+
+    function updateMode() {
+      const isSummary = messageType.value === 'resumo_compras';
+      fields.classList.toggle('d-none', !isSummary);
+      student.required = isSummary;
+      month.required = isSummary;
+      message.required = !isSummary;
+      message.readOnly = isSummary;
+      messageHelp.textContent = isSummary
+        ? 'A lista é recalculada pelo servidor no momento do envio.'
+        : 'Digite a mensagem que será enviada.';
+      filterStudents();
+    }
+
+    function updateResponsible() {
+      phone.disabled = Boolean(responsavel.value);
+      filterStudents();
+      if (messageType.value === 'resumo_compras') {
+        message.value = '';
+        previewStatus.textContent = '';
+      }
+    }
+
+    preview.addEventListener('click', async () => {
+      if (!responsavel.value) {
+        previewStatus.textContent = 'Selecione o responsável.';
+        return;
+      }
+      if (!student.value) {
+        previewStatus.textContent = 'Selecione o aluno.';
+        return;
+      }
+      if (!month.value) {
+        previewStatus.textContent = 'Selecione o mês.';
+        return;
+      }
+      preview.disabled = true;
+      previewStatus.textContent = 'Carregando compras…';
+      const params = new URLSearchParams({
+        responsavel_id: responsavel.value,
+        aluno_id: student.value,
+        mes_referencia: month.value
+      });
+      try {
+        const response = await fetch(`/whatsapp/purchase-summary?${params}`, {
+          headers: { 'Accept': 'application/json' }
+        });
+        const data = await response.json();
+        if (!response.ok || !data.ok) {
+          previewStatus.textContent = data.erro || 'Não foi possível gerar a prévia.';
+          return;
+        }
+        message.value = data.mensagem;
+        previewStatus.textContent =
+          `${data.quantidade_compras} compra(s) — total de ` +
+          new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(data.total);
+      } catch (_) {
+        previewStatus.textContent = 'Falha ao carregar a lista de compras.';
+      } finally {
+        preview.disabled = false;
+      }
+    });
+
+    messageType.addEventListener('change', updateMode);
+    responsavel.addEventListener('change', updateResponsible);
+    student.addEventListener('change', () => {
+      message.value = '';
+      previewStatus.textContent = '';
+    });
+    month.addEventListener('change', () => {
+      message.value = '';
+      previewStatus.textContent = '';
+    });
+
+    updateResponsible();
+    updateMode();
+  })();
+</script>
+{% if is_admin %}
+<script>
+  (() => {
+    const badge = document.querySelector('#connection-badge');
+    const qrContainer = document.querySelector('#qr-container');
+    const qrImage = document.querySelector('#qr-image');
+    const text = document.querySelector('#connection-text');
+    async function refresh() {
+      try {
+        const response = await fetch('/whatsapp/status', { headers: { 'Accept': 'application/json' } });
+        const data = await response.json();
+        if (!data.ok) return;
+        badge.textContent = (data.status || 'desconectado').replaceAll('_', ' ');
+        badge.className = 'badge fs-6 ' + (data.conectado ? 'text-bg-success' : data.status === 'aguardando_qr' ? 'text-bg-warning' : 'text-bg-secondary');
+        if (data.conectado) {
+          text.textContent = data.telefone ? `Conectado como ${data.telefone}` : 'Conectado';
+          qrContainer.classList.add('d-none');
+        } else if (data.qr_code) {
+          qrImage.src = data.qr_code;
+          qrContainer.classList.remove('d-none');
+        }
+      } catch (_) { }
+    }
+    setInterval(refresh, 5000);
+  })();
+</script>
+{% endif %}
+{% endblock %}

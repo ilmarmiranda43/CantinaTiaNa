@@ -1,0 +1,2 @@
+"""Rotas da aplicação."""
+

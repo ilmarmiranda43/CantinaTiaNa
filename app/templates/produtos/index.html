@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Produtos{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3"><h1 class="h2 mb-0">Produtos</h1>{% if is_admin or is_prop %}<a class="btn btn-primary" href="/produtos/new">Novo produto</a>{% endif %}</div>
+<div class="table-responsive card shadow-sm"><table class="table table-hover align-middle mb-0">
+<thead><tr><th>Nome</th><th>Categoria</th><th>Preço</th><th>Quantidade</th>{% if is_admin or is_prop %}<th></th>{% endif %}</tr></thead>
+<tbody>{% for item in items %}<tr><td>{{ item.nome }}</td><td>{{ item.categoria or '—' }}</td><td>{{ item.preco|brl }}</td><td>{{ item.quantidade }}</td>{% if is_admin or is_prop %}<td class="text-end"><a class="btn btn-sm btn-outline-primary" href="/produtos/{{ item.id }}/edit">Editar</a><form method="post" action="/produtos/{{ item.id }}/delete" class="d-inline" data-confirm="Excluir este produto?"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><button class="btn btn-sm btn-outline-danger">Excluir</button></form></td>{% endif %}</tr>{% else %}<tr><td colspan="5" class="text-center text-muted py-4">Nenhum produto cadastrado.</td></tr>{% endfor %}</tbody>
+</table></div>
+{% endblock %}
+

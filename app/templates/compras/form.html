@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Nova compra{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-lg-7"><h1 class="h2 mb-3">Lançamento simples</h1><p class="text-muted">Para vendas com produtos, use a tela de vendas.</p>{% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+<form method="post" class="card card-body shadow-sm"><input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+<div class="mb-3"><label class="form-label">Aluno</label><select class="form-select" name="aluno_id" required><option value="">Selecione</option>{% for a in alunos %}<option value="{{ a.id }}">{{ a.nome }}</option>{% endfor %}</select></div>
+<div class="mb-3"><label class="form-label">Valor total</label><input class="form-control" name="valor_total" inputmode="decimal" required></div>
+<div><button class="btn btn-primary">Registrar</button> <a class="btn btn-outline-secondary" href="/compras">Cancelar</a></div></form></div></div>
+{% endblock %}
+

@@ -1,0 +1,2 @@
+"""Cantina Escolar em Python."""
+

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Usuários{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div><h1 class="h2 mb-0">Usuários</h1><p class="text-muted mb-0">Gerencie acesso e permissão de WhatsApp.</p></div>
+  <a class="btn btn-primary" href="/account/register">Novo usuário</a>
+</div>
+<div class="table-responsive card shadow-sm">
+  <table class="table table-hover align-middle mb-0">
+    <thead><tr><th>Nome</th><th>E-mail</th><th>Perfil</th><th>WhatsApp</th><th></th></tr></thead>
+    <tbody>
+      {% for row in users %}
+      <tr>
+        <td>{{ row.user.nome }}</td>
+        <td>{{ row.user.email }}</td>
+        <td>{{ row.roles|join(', ') }}</td>
+        <td>{% if 'Admin' in row.roles or row.user.pode_enviar_whatsapp %}<span class="badge text-bg-success">Permitido</span>{% else %}<span class="badge text-bg-secondary">Bloqueado</span>{% endif %}</td>
+        <td class="text-end">
+          <a class="btn btn-sm btn-outline-primary" href="/account/users/{{ row.user.id }}/edit">Editar</a>
+          {% if row.user.id != current_user.id %}
+          <form method="post" action="/account/users/{{ row.user.id }}/delete" class="d-inline" data-confirm="Excluir este usuário?">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button class="btn btn-sm btn-outline-danger" type="submit">Excluir</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% else %}<tr><td colspan="5" class="text-muted text-center py-4">Nenhum usuário cadastrado.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+

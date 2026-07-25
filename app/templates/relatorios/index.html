@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Relatório de saldos{% endblock %}
+{% block content %}
+<div class="mb-3">
+    <h1 class="h2 mb-1">Saldo por aluno</h1>
+    <p class="text-muted mb-0">Limite mensal do responsável menos o consumo registrado no mês atual.</p>
+</div>
+<div class="table-responsive card shadow-sm">
+    <table class="table table-hover align-middle mb-0">
+        <thead>
+            <tr>
+                <th>Aluno</th>
+                <th>Série</th>
+                <th>Responsável</th>
+                <th>Limite</th>
+                <th>Consumido</th>
+                <th>Disponível</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in items %}<tr>
+                <td>{{ row.aluno.nome }}</td>
+                <td>{{ row.aluno.serie }}</td>
+                <td>{{ row.aluno.responsavel.nome }}</td>
+                <td>{{ row.limite|brl }}</td>
+                <td>{{ row.consumido|brl }}</td>
+                <td><strong class="{% if row.disponivel > 0 %}text-success{% else %}text-danger{% endif %}">{{
+                        row.disponivel|brl }}</strong></td>
+                <td class="text-end"><a class="btn btn-sm btn-outline-primary"
+                        href="/relatorios/aluno/{{ row.aluno.id }}">Compras</a></td>
+            </tr>
+            {% else %}<tr>
+                <td colspan="7" class="text-center text-muted py-4">Nenhum aluno encontrado.</td>
+            </tr>{% endfor %}</tbody>
+    </table>
+</div>
+{% endblock %}

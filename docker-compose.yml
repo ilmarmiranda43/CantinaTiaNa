@@ -1,0 +1,49 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: cantina
+      POSTGRES_USER: cantina
+      POSTGRES_PASSWORD: cantina
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cantina -d cantina"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://cantina:cantina@postgres:5432/cantina
+      SECRET_KEY: ${SECRET_KEY}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      ADMIN_NAME: ${ADMIN_NAME:-Administrador}
+      WHATSAPP_SERVICE_URL: http://whatsapp:3001
+      WHATSAPP_API_KEY: ${WHATSAPP_API_KEY}
+      WHATSAPP_SESSION_ID: ${WHATSAPP_SESSION_ID:-cantina-principal}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      whatsapp:
+        condition: service_started
+
+  whatsapp:
+    build: ./whatsapp-service
+    environment:
+      DATABASE_URL: postgresql://cantina:cantina@postgres:5432/cantina
+      BAILEYS_API_KEY: ${WHATSAPP_API_KEY}
+      PORT: 3001
+      QR_WAIT_TIMEOUT_MS: 12000
+      RECONNECT_DELAY_MS: 5000
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres-data:
+

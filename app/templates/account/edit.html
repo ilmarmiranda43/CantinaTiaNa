@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Editar usuário{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-lg-8">
+  <h1 class="h2 mb-3">Editar usuário</h1>
+  {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+  <form method="post" class="card card-body shadow-sm">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <div class="row g-3">
+      <div class="col-md-6"><label class="form-label">Nome</label><input class="form-control" name="nome" value="{{ target.nome }}" required></div>
+      <div class="col-md-6"><label class="form-label">E-mail</label><input class="form-control" type="email" name="email" value="{{ target.email }}" required></div>
+      <div class="col-md-6"><label class="form-label">Telefone</label><input class="form-control" name="phone_number" value="{{ target.phone_number }}"></div>
+      <div class="col-md-6"><label class="form-label">RA</label><input class="form-control" name="ra" value="{{ target.ra }}"></div>
+      <div class="col-md-6"><label class="form-label">Perfil</label><input class="form-control" value="{{ target_roles|join(', ') }}" disabled></div>
+      {% if is_admin %}
+      <div class="col-md-6 d-flex align-items-end"><div class="form-check mb-2"><input class="form-check-input" type="checkbox" name="pode_enviar_whatsapp" value="true" id="wa" {% if target.pode_enviar_whatsapp or 'Admin' in target_roles %}checked{% endif %} {% if 'Admin' in target_roles %}disabled{% endif %}><label class="form-check-label" for="wa">Pode enviar WhatsApp</label></div></div>
+      {% endif %}
+    </div>
+    <div class="mt-4"><button class="btn btn-primary" type="submit">Salvar</button> <a class="btn btn-outline-secondary" href="/account/users">Cancelar</a></div>
+  </form>
+</div></div>
+{% endblock %}
+
