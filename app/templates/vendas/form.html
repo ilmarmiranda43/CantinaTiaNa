@@ -1,74 +1,99 @@
 {% extends "base.html" %}
 {% block title %}Registrar venda{% endblock %}
 {% block content %}
-<div class="d-flex justify-content-between align-items-start mb-3"><div><h1 class="h2 mb-1">Registrar venda</h1><p class="text-muted mb-0">O limite mensal do responsável é validado antes da gravação.</p></div></div>
+<div class="d-flex justify-content-between align-items-start mb-3">
+  <div>
+    <h1 class="h2 mb-1">Registrar venda</h1>
+    <p class="text-muted mb-0">O limite mensal do responsável é validado antes da gravação.</p>
+  </div>
+</div>
 {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 <form method="post" class="card card-body shadow-sm" id="sale-form">
   <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
   <div class="row g-3 align-items-end mb-4">
-    <div class="col-lg-7"><label class="form-label">Aluno</label><select class="form-select" name="aluno_id" id="student" required><option value="">Selecione</option>{% for a in alunos %}<option value="{{ a.id }}" {% if selected_id == a.id %}selected{% endif %}>{{ a.nome }}</option>{% endfor %}</select></div>
-    <div class="col-lg-5"><div class="limit-box rounded p-3">
-      <div class="small text-muted">Disponível no mês</div><strong id="available">{{ limits.disponivel|brl if limits else 'Selecione um aluno' }}</strong>
-      <div class="small text-muted" id="limit-detail">{% if limits %}Limite {{ limits.limite|brl }} · consumido {{ limits.consumido|brl }}{% endif %}</div>
-    </div></div>
+    <div class="col-lg-7"><label class="form-label">Aluno</label><select class="form-select" name="aluno_id"
+        id="student" required>
+        <option value="">Selecione</option>{% for a in alunos %}<option value="{{ a.id }}" {% if selected_id==a.id
+          %}selected{% endif %}>{{ a.nome }}</option>{% endfor %}
+      </select></div>
+    <div class="col-lg-5">
+      <div class="limit-box rounded p-3">
+        <div class="small text-muted">Disponível no mês</div><strong id="available">{{ limits.disponivel|brl if limits
+          else 'Selecione um aluno' }}</strong>
+        <div class="small text-muted" id="limit-detail">{% if limits %}Limite {{ limits.limite|brl }} · consumido {{
+          limits.consumido|brl }}{% endif %}</div>
+      </div>
+    </div>
   </div>
-  <div class="d-flex justify-content-between align-items-center mb-2"><h2 class="h5 mb-0">Produtos</h2><button class="btn btn-sm btn-outline-primary" type="button" id="add-item">Adicionar item</button></div>
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <h2 class="h5 mb-0">Produtos</h2><button class="btn btn-sm btn-outline-primary" type="button"
+      id="add-item">Adicionar item</button>
+  </div>
   <div id="items"></div>
   <template id="item-template">
     <div class="row g-2 align-items-end sale-row mb-2">
-      <div class="col-md-7"><label class="form-label">Produto</label><select class="form-select product" name="produto_id" required><option value="">Selecione</option>{% for p in produtos %}<option value="{{ p.id }}" data-price="{{ p.preco }}">{{ p.nome }} — {{ p.preco|brl }}</option>{% endfor %}</select></div>
-      <div class="col-6 col-md-2"><label class="form-label">Qtd.</label><input class="form-control qty" type="number" name="quantidade" min="1" value="1" required></div>
-      <div class="col-6 col-md-2"><label class="form-label">Subtotal</label><input class="form-control subtotal" value="R$ 0,00" readonly></div>
-      <div class="col-md-1"><button class="btn btn-outline-danger w-100 remove-item" type="button" aria-label="Remover">×</button></div>
+      <div class="col-md-7"><label class="form-label">Produto</label><select class="form-select product"
+          name="produto_id" required>
+          <option value="">Selecione</option>{% for p in produtos %}<option value="{{ p.id }}"
+            data-price="{{ p.preco }}">{{ p.nome }} — {{ p.preco|brl }}</option>{% endfor %}
+        </select></div>
+      <div class="col-6 col-md-2"><label class="form-label">Qtd.</label><input class="form-control qty" type="number"
+          name="quantidade" min="1" value="1" required></div>
+      <div class="col-6 col-md-2"><label class="form-label">Subtotal</label><input class="form-control subtotal"
+          value="R$ 0,00" readonly></div>
+      <div class="col-md-1"><button class="btn btn-outline-danger w-100 remove-item" type="button"
+          aria-label="Remover">×</button></div>
     </div>
   </template>
-  <div class="text-end border-top pt-3 mt-2"><span class="text-muted">Total da venda</span><div class="fs-3 fw-bold" id="sale-total">R$ 0,00</div></div>
-  <div class="mt-3"><button class="btn btn-primary" type="submit">Registrar venda</button> <a class="btn btn-outline-secondary" href="/">Cancelar</a></div>
+  <div class="text-end border-top pt-3 mt-2"><span class="text-muted">Total da venda</span>
+    <div class="fs-3 fw-bold" id="sale-total">R$ 0,00</div>
+  </div>
+  <div class="mt-3"><button class="btn btn-primary" type="submit">Registrar venda</button> <a
+      class="btn btn-outline-secondary" href="/">Cancelar</a></div>
 </form>
 {% endblock %}
 {% block scripts %}
 <script>
-(() => {
-  const items = document.querySelector('#items');
-  const template = document.querySelector('#item-template');
-  const money = value => new Intl.NumberFormat('pt-BR', {style:'currency', currency:'BRL'}).format(value || 0);
-  function update() {
-    let total = 0;
-    items.querySelectorAll('.sale-row').forEach(row => {
-      const select = row.querySelector('.product');
-      const option = select.options[select.selectedIndex];
-      const price = Number(option?.dataset.price || 0);
-      const qty = Number(row.querySelector('.qty').value || 0);
-      total += price * qty;
-      row.querySelector('.subtotal').value = money(price * qty);
-    });
-    document.querySelector('#sale-total').textContent = money(total);
-  }
-  function add() {
-    items.appendChild(template.content.cloneNode(true));
-    update();
-  }
-  document.querySelector('#add-item').addEventListener('click', add);
-  items.addEventListener('input', update);
-  items.addEventListener('change', update);
-  items.addEventListener('click', event => {
-    if (event.target.classList.contains('remove-item')) {
-      event.target.closest('.sale-row').remove();
-      if (!items.children.length) add();
+  (() => {
+    const items = document.querySelector('#items');
+    const template = document.querySelector('#item-template');
+    const money = value => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
+    function update() {
+      let total = 0;
+      items.querySelectorAll('.sale-row').forEach(row => {
+        const select = row.querySelector('.product');
+        const option = select.options[select.selectedIndex];
+        const price = Number(option?.dataset.price || 0);
+        const qty = Number(row.querySelector('.qty').value || 0);
+        total += price * qty;
+        row.querySelector('.subtotal').value = money(price * qty);
+      });
+      document.querySelector('#sale-total').textContent = money(total);
+    }
+    function add() {
+      items.appendChild(template.content.cloneNode(true));
       update();
     }
-  });
-  document.querySelector('#student').addEventListener('change', async event => {
-    const id = event.target.value;
-    if (!id) return;
-    const response = await fetch(`/vendas/limit/${id}`);
-    if (!response.ok) return;
-    const data = await response.json();
-    document.querySelector('#available').textContent = money(data.disponivel);
-    document.querySelector('#limit-detail').textContent = `Limite ${money(data.limite)} · consumido ${money(data.consumidoMes)}`;
-  });
-  add();
-})();
+    document.querySelector('#add-item').addEventListener('click', add);
+    items.addEventListener('input', update);
+    items.addEventListener('change', update);
+    items.addEventListener('click', event => {
+      if (event.target.classList.contains('remove-item')) {
+        event.target.closest('.sale-row').remove();
+        if (!items.children.length) add();
+        update();
+      }
+    });
+    document.querySelector('#student').addEventListener('change', async event => {
+      const id = event.target.value;
+      if (!id) return;
+      const response = await fetch(`/vendas/limit/${id}`);
+      if (!response.ok) return;
+      const data = await response.json();
+      document.querySelector('#available').textContent = money(data.disponivel);
+      document.querySelector('#limit-detail').textContent = `Limite ${money(data.limite)} · consumido ${money(data.consumidoMes)}`;
+    });
+    add();
+  })();
 </script>
 {% endblock %}
-

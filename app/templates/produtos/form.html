@@ -1,14 +1,27 @@
 {% extends "base.html" %}
 {% block title %}{{ 'Editar' if item and item.id else 'Novo' }} produto{% endblock %}
 {% block content %}
-<div class="row justify-content-center"><div class="col-lg-8"><h1 class="h2 mb-3">{{ 'Editar' if item and item.id else 'Novo' }} produto</h1>
-{% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
-<form method="post" class="card card-body shadow-sm"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><div class="row g-3">
-<div class="col-md-7"><label class="form-label">Nome</label><input class="form-control" name="nome" maxlength="120" value="{{ item.nome if item else '' }}" required></div>
-<div class="col-md-5"><label class="form-label">Categoria</label><input class="form-control" name="categoria" maxlength="80" value="{{ item.categoria if item and item.categoria else '' }}"></div>
-<div class="col-md-6"><label class="form-label">Preço</label><input class="form-control" name="preco" inputmode="decimal" value="{{ item.preco if item else '' }}" required></div>
-<div class="col-md-6"><label class="form-label">Quantidade</label><input class="form-control" type="number" min="0" name="quantidade" value="{{ item.quantidade if item else 0 }}" required></div>
-</div><div class="mt-4"><button class="btn btn-primary">Salvar</button> <a class="btn btn-outline-secondary" href="/produtos">Cancelar</a></div></form>
-</div></div>
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <h1 class="h2 mb-3">{{ 'Editar' if item and item.id else 'Novo' }} produto</h1>
+        {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+        <form method="post" class="card card-body shadow-sm"><input type="hidden" name="csrf_token"
+                value="{{ csrf_token }}">
+            <div class="row g-3">
+                <div class="col-md-7"><label class="form-label">Nome</label><input class="form-control" name="nome"
+                        maxlength="120" value="{{ item.nome if item else '' }}" required></div>
+                <div class="col-md-5"><label class="form-label">Categoria</label><input class="form-control"
+                        name="categoria" maxlength="80" value="{{ item.categoria if item and item.categoria else '' }}">
+                </div>
+                <div class="col-md-6"><label class="form-label">Preço</label><input class="form-control" name="preco"
+                        inputmode="decimal" value="{{ item.preco if item else '' }}" required></div>
+                <div class="col-md-6"><label class="form-label">Quantidade</label><input class="form-control"
+                        type="number" min="0" name="quantidade" value="{{ item.quantidade if item else 0 }}" required>
+                </div>
+            </div>
+            <div class="mt-4"><button class="btn btn-primary">Salvar</button> <a class="btn btn-outline-secondary"
+                    href="/produtos">Cancelar</a></div>
+        </form>
+    </div>
+</div>
 {% endblock %}
-

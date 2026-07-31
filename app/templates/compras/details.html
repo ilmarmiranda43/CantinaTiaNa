@@ -1,10 +1,39 @@
 {% extends "base.html" %}
 {% block title %}Compra {{ item.id }}{% endblock %}
 {% block content %}
-{% if request.query_params.get('success') %}<div class="alert alert-success">Venda registrada com sucesso.</div>{% endif %}
-<div class="d-flex justify-content-between align-items-start mb-3"><div><h1 class="h2">Compra #{{ item.id }}</h1><p class="text-muted">{{ item.aluno.nome }} — {{ item.data.strftime('%d/%m/%Y %H:%M') }}</p></div><strong class="fs-4">{{ item.valor_total|brl }}</strong></div>
-<div class="card shadow-sm"><div class="card-body"><h2 class="h5">Itens</h2>
-{% if item.itens %}<div class="table-responsive"><table class="table mb-0"><thead><tr><th>Produto</th><th>Quantidade</th><th>Unitário</th><th>Subtotal</th></tr></thead><tbody>{% for row in item.itens %}<tr><td>{{ row.produto.nome }}</td><td>{{ row.quantidade }}</td><td>{{ row.preco_unitario|brl }}</td><td>{{ row.subtotal|brl }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<p class="text-muted mb-0">Lançamento sem itens detalhados.</p>{% endif %}
-</div></div><a class="btn btn-outline-secondary mt-3" href="/compras">Voltar</a>
-{% endblock %}
+{% if request.query_params.get('success') %}<div class="alert alert-success">Venda registrada com sucesso.</div>{% endif
+%}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-start mb-3">
+        <div>
+            <h1 class="h2">Compra #{{ item.id }}</h1>
+            <p class="text-muted">{{ item.aluno.nome }} — {{ item.data.strftime('%d/%m/%Y %H:%M') }}</p>
+        </div><strong class="fs-4">{{ item.valor_total|brl }}</strong>
+    </div>
 
+    <div class="table-responsive card shadow-sm">
+        <div class="card-body">
+            <h2 class="h5">Itens</h2>
+            {% if item.itens %}<div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Produto</th>
+                            <th>Quantidade</th>
+                            <th>Unitário</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>{% for row in item.itens %}<tr>
+                            <td>{{ row.produto.nome }}</td>
+                            <td>{{ row.quantidade }}</td>
+                            <td>{{ row.preco_unitario|brl }}</td>
+                            <td>{{ row.subtotal|brl }}</td>
+                        </tr>{% endfor %}</tbody>
+                </table>
+            </div>{% else %}<p class="text-muted mb-0">Lançamento sem itens detalhados.</p>{% endif %}
+        </div>
+    </div><a class="btn btn-outline-secondary mt-3" href="/compras">Voltar</a>
+</div>
+
+{% endblock %}

@@ -1,17 +1,41 @@
 {% extends "base.html" %}
 {% block title %}{{ 'Editar' if item else 'Novo' }} aluno{% endblock %}
 {% block content %}
-<div class="row justify-content-center"><div class="col-lg-8">
-<h1 class="h2 mb-3">{{ 'Editar' if item else 'Novo' }} aluno</h1>{% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
-<form method="post" class="card card-body shadow-sm"><input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-<div class="row g-3">
-  <div class="col-md-7"><label class="form-label">Nome</label><input class="form-control" name="nome" value="{{ item.nome if item else '' }}" required></div>
-  <div class="col-md-5"><label class="form-label">Data de nascimento</label><input class="form-control" type="date" name="data_nascimento" value="{{ item.data_nascimento.strftime('%Y-%m-%d') if item else '' }}" required></div>
-  <div class="col-md-4"><label class="form-label">Série</label><input class="form-control" name="serie" value="{{ item.serie if item else '' }}" required></div>
-  <div class="col-md-8"><label class="form-label">Responsável</label><select class="form-select" name="responsavel_id" required><option value="">Selecione</option>{% for r in responsaveis %}<option value="{{ r.id }}" {% if item and item.responsavel_id == r.id %}selected{% endif %}>{{ r.nome }}</option>{% endfor %}</select></div>
-  <div class="col-12"><label class="form-label">Usuário vinculado (opcional)</label><select class="form-select" name="application_user_id"><option value="">Sem vínculo</option>{% for u in users %}<option value="{{ u.id }}" {% if item and item.application_user_id == u.id %}selected{% endif %}>{{ u.nome }} — {{ u.email }}</option>{% endfor %}</select><div class="form-text">O vínculo limita a visualização do aluno às próprias compras.</div></div>
-</div>
-<div class="mt-4"><button class="btn btn-primary">Salvar</button> <a class="btn btn-outline-secondary" href="/alunos">Cancelar</a></div>
-</form></div></div>
-{% endblock %}
 
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <h1 class="h2 mb-3">{{ 'Editar' if item else 'Novo' }} aluno</h1>{% if error %}<div class="alert alert-danger">{{
+        error }}</div>{% endif %}
+      <form method="post" class="card card-body shadow-sm border-0" style="background-color: #e882a5 !important;"><input
+          type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <div class="row g-3">
+          <div class="col-md-7"><label class="form-label">Nome</label><input class="form-control" name="nome"
+              value="{{ item.nome if item else '' }}" required></div>
+          <div class="col-md-5"><label class="form-label">Data de nascimento</label><input class="form-control"
+              type="date" name="data_nascimento" value="{{ item.data_nascimento.strftime('%Y-%m-%d') if item else '' }}"
+              required></div>
+          <div class="col-md-4"><label class="form-label">Série</label><input class="form-control" name="serie"
+              value="{{ item.serie if item else '' }}" required></div>
+          <div class="col-md-8"><label class="form-label">Responsável</label><select class="form-select"
+              name="responsavel_id" required>
+              <option value="">Selecione</option>{% for r in responsaveis %}<option value="{{ r.id }}" {% if item and
+                item.responsavel_id==r.id %}selected{% endif %}>{{ r.nome }}</option>{% endfor %}
+            </select></div>
+          <div class="col-12"><label class="form-label">Usuário vinculado (opcional)</label><select class="form-select"
+              name="application_user_id">
+              <option value="">Sem vínculo</option>{% for u in users %}<option value="{{ u.id }}" {% if item and
+                item.application_user_id==u.id %}selected{% endif %}>{{ u.nome }} — {{ u.email }}</option>{% endfor %}
+            </select>
+            <div class="form-text">O vínculo limita a visualização do aluno às próprias compras.</div>
+          </div>
+        </div>
+        <div class="mt-4"><button class="btn btn-primary">Salvar</button> <a class="btn btn-outline-secondary"
+            href="/alunos">Cancelar</a></div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}

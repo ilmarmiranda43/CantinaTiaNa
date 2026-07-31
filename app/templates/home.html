@@ -1,21 +1,12 @@
 {% extends "base.html" %}
+
 {% block title %}Início — Cantina Escolar{% endblock %}
+
 {% block content %}
-<section class="hero row align-items-center g-4">
-  <div class="col-lg-7">
-    <span class="badge text-bg-primary mb-3">Gestão simples e segura</span>
-    <h1 class="display-5 fw-bold">Cantina Escolar</h1>
-    <p class="lead text-muted">Cadastre alunos e produtos, registre compras, acompanhe limites mensais e envie avisos
-      pelo WhatsApp.</p>
-    <div class="d-flex flex-wrap gap-2">
-      <a class="btn btn-primary" href="/vendas/new">Registrar venda</a>
-      <a class="btn btn-outline-primary" href="/relatorios">Ver saldos</a>
-      {% if can_whatsapp %}<a class="btn btn-success" href="/whatsapp">Abrir WhatsApp</a>{% endif %}
-    </div>
-  </div>
-  <div class="col-lg-5 text-center">
-    <img class="img-fluid rounded-4 shadow-sm hero-image"
-      src="{{ url_for('static', path='images/cantina-welcome.jpg') }}" alt="Cantina escolar">
-  </div>
+<section class="hero">
+
+  <!-- <img class="hero-image" src="{{ url_for('static', path='images/cantina-welcome.jpg') }}" alt="Cantina escolar"> -->
+  <img class="hero-image" src="{{ url_for('static', path='images/cantina.jpg') }}" alt="Cantina escolar">
+
 </section>
 {% endblock %}

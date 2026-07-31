@@ -1,18 +1,29 @@
 {% extends "base.html" %}
 {% block title %}{{ 'Editar' if item and item.id else 'Novo' }} responsável{% endblock %}
 {% block content %}
-<div class="row justify-content-center"><div class="col-lg-8">
-<h1 class="h2 mb-3">{{ 'Editar' if item and item.id else 'Novo' }} responsável</h1>
-{% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
-<form method="post" class="card card-body shadow-sm"><input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-  <div class="row g-3">
-    <div class="col-md-8"><label class="form-label">Nome</label><input class="form-control" name="nome" value="{{ item.nome if item else '' }}" required></div>
-    <div class="col-md-4"><label class="form-label">Limite mensal</label><input class="form-control" name="valor_para_cantina" value="{{ item.valor_para_cantina if item else '' }}" inputmode="decimal" required></div>
-    <div class="col-md-6"><label class="form-label">Telefone</label><input class="form-control" name="fone" value="{{ item.fone if item and item.fone else '' }}"></div>
-    <div class="col-md-6"><label class="form-label">E-mail</label><input class="form-control" type="email" name="email" value="{{ item.email if item and item.email else '' }}"></div>
-    <div class="col-md-4"><label class="form-label">Dia do pagamento</label><input class="form-control" type="number" min="1" max="31" name="dia_pgto" value="{{ item.dia_pgto if item and item.dia_pgto else '' }}"></div>
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <h1 class="h2 mb-3">{{ 'Editar' if item and item.id else 'Novo' }} responsável</h1>
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+    <form method="post" class="card card-body shadow-sm"><input type="hidden" name="csrf_token"
+        value="{{ csrf_token }}">
+      <div class="row g-3">
+        <div class="col-md-8"><label class="form-label">Nome</label><input class="form-control" name="nome"
+            value="{{ item.nome if item else '' }}" required></div>
+        <div class="col-md-4"><label class="form-label">Limite mensal</label><input class="form-control"
+            name="valor_para_cantina" value="{{ item.valor_para_cantina if item else '' }}" inputmode="decimal"
+            required></div>
+        <div class="col-md-6"><label class="form-label">Telefone</label><input class="form-control" name="fone"
+            value="{{ item.fone if item and item.fone else '' }}"></div>
+        <div class="col-md-6"><label class="form-label">E-mail</label><input class="form-control" type="email"
+            name="email" value="{{ item.email if item and item.email else '' }}"></div>
+        <div class="col-md-4"><label class="form-label">Dia do pagamento</label><input class="form-control"
+            type="number" min="1" max="31" name="dia_pgto"
+            value="{{ item.dia_pgto if item and item.dia_pgto else '' }}"></div>
+      </div>
+      <div class="mt-4"><button class="btn btn-primary">Salvar</button> <a class="btn btn-outline-secondary"
+          href="/responsaveis">Cancelar</a></div>
+    </form>
   </div>
-  <div class="mt-4"><button class="btn btn-primary">Salvar</button> <a class="btn btn-outline-secondary" href="/responsaveis">Cancelar</a></div>
-</form></div></div>
+</div>
 {% endblock %}
-

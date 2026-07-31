@@ -1,9 +1,34 @@
 {% extends "base.html" %}
 {% block title %}Compras{% endblock %}
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3"><h1 class="h2 mb-0">Compras</h1>{% if is_admin or is_prop %}<a class="btn btn-outline-primary" href="/compras/new">Lançamento simples</a>{% endif %}</div>
-<div class="table-responsive card shadow-sm"><table class="table table-hover align-middle mb-0"><thead><tr><th>Data</th><th>Aluno</th><th>Total</th><th></th></tr></thead><tbody>
-{% for item in items %}<tr><td>{{ item.data.strftime('%d/%m/%Y %H:%M') }}</td><td>{{ item.aluno.nome }}</td><td>{{ item.valor_total|brl }}</td><td class="text-end"><a class="btn btn-sm btn-outline-primary" href="/compras/{{ item.id }}">Detalhes</a></td></tr>{% else %}<tr><td colspan="4" class="text-center text-muted py-4">Nenhuma compra registrada.</td></tr>{% endfor %}
-</tbody></table></div>
-{% endblock %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h2 mb-0">Compras</h1>{% if is_admin or is_prop %}<a class="btn btn-primary"
+            href="/compras/new">Lançamento simples</a>{% endif %}
+    </div>
+    <div class="table-responsive card shadow-sm">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Aluno</th>
+                    <th>Total</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}<tr>
+                    <td>{{ item.data.strftime('%d/%m/%Y %H:%M') }}</td>
+                    <td>{{ item.aluno.nome }}</td>
+                    <td>{{ item.valor_total|brl }}</td>
+                    <td class="text-end"><a class="btn btn-sm btn-outline-primary"
+                            href="/compras/{{ item.id }}">Detalhes</a></td>
+                </tr>{% else %}<tr>
+                    <td colspan="4" class="text-center text-muted py-4">Nenhuma compra registrada.</td>
+                </tr>{% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 
+{% endblock %}

@@ -1,14 +1,36 @@
 {% extends "base.html" %}
 {% block title %}Responsáveis{% endblock %}
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3"><h1 class="h2 mb-0">Responsáveis</h1>{% if is_admin or is_prop %}<a class="btn btn-primary" href="/responsaveis/new">Novo responsável</a>{% endif %}</div>
-<div class="table-responsive card shadow-sm"><table class="table table-hover align-middle mb-0">
-  <thead><tr><th>Nome</th><th>Limite mensal</th><th>Telefone</th><th>E-mail</th><th>Dia pgto.</th>{% if is_admin or is_prop %}<th></th>{% endif %}</tr></thead>
-  <tbody>{% for item in items %}<tr>
-    <td>{{ item.nome }}</td><td>{{ item.valor_para_cantina|brl }}</td><td>{{ item.fone or '—' }}</td><td>{{ item.email or '—' }}</td><td>{{ item.dia_pgto or '—' }}</td>
-    {% if is_admin or is_prop %}<td class="text-end"><a class="btn btn-sm btn-outline-primary" href="/responsaveis/{{ item.id }}/edit">Editar</a>
-      <form method="post" action="/responsaveis/{{ item.id }}/delete" class="d-inline" data-confirm="Excluir este responsável?"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><button class="btn btn-sm btn-outline-danger">Excluir</button></form></td>{% endif %}
-  </tr>{% else %}<tr><td colspan="6" class="text-center text-muted py-4">Nenhum responsável cadastrado.</td></tr>{% endfor %}</tbody>
-</table></div>
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h2 mb-0">Responsáveis</h1>{% if is_admin or is_prop %}<a class="btn btn-primary"
+    href="/responsaveis/new">Novo responsável</a>{% endif %}
+</div>
+<div class="table-responsive card shadow-sm">
+  <table class="table table-hover align-middle mb-0">
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>Limite mensal</th>
+        <th>Telefone</th>
+        <th>E-mail</th>
+        <th>Dia pgto.</th>{% if is_admin or is_prop %}<th></th>{% endif %}
+      </tr>
+    </thead>
+    <tbody>{% for item in items %}<tr>
+        <td>{{ item.nome }}</td>
+        <td>{{ item.valor_para_cantina|brl }}</td>
+        <td>{{ item.fone or '—' }}</td>
+        <td>{{ item.email or '—' }}</td>
+        <td>{{ item.dia_pgto or '—' }}</td>
+        {% if is_admin or is_prop %}<td class="text-end"><a class="btn btn-sm btn-outline-primary"
+            href="/responsaveis/{{ item.id }}/edit">Editar</a>
+          <form method="post" action="/responsaveis/{{ item.id }}/delete" class="d-inline"
+            data-confirm="Excluir este responsável?"><input type="hidden" name="csrf_token"
+              value="{{ csrf_token }}"><button class="btn btn-sm btn-outline-danger">Excluir</button></form>
+        </td>{% endif %}
+      </tr>{% else %}<tr>
+        <td colspan="6" class="text-center text-muted py-4">Nenhum responsável cadastrado.</td>
+      </tr>{% endfor %}</tbody>
+  </table>
+</div>
 {% endblock %}
-

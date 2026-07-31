@@ -1,13 +1,159 @@
-html { min-height: 100%; }
-body { min-height: 100vh; display: flex; flex-direction: column; background: #f7f9fc; }
-main { flex: 1; }
-.navbar .nav-link { color: rgba(255,255,255,.88); }
-.navbar .nav-link:hover { color: #fff; }
-.card { border: 0; border-radius: 1rem; }
-.table > :not(caption) > * > * { padding: .85rem; }
-.hero { min-height: 65vh; }
-.hero-image { max-height: 420px; object-fit: cover; }
-.limit-box { background: #edf6ff; border: 1px solid #cfe5ff; }
-.whatsapp-qr { width: min(320px, 100%); height: auto; border-radius: .75rem; border: 1px solid #dee2e6; padding: .5rem; background: #fff; }
-footer { background: #fff; }
+:root {
+/* Tom do Botão Principal, Navbar e Detalhes */
+  --bs-primary: #e882a5;        /* Um rosa médio, bem visível para botões */
+  --bs-primary-hover: #d66b90;  /* Rosa um pouco mais escuro quando passa o mouse */
+  --bs-primary-rgb: 232, 130, 165;
+  --bs-secondary: black;
+}
 
+html {
+    min-height: 100%;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #fde8ed;
+}
+
+main {
+    flex: 1;
+}
+
+/* Garante que o texto dentro da navbar/botões continue legível em fundos claros */
+.navbar-dark .navbar-brand,
+.navbar-dark .nav-link,
+.navbar-dark .btn-link {
+  color: #4a2e35 !important; /* Cor de texto vinho/escuro para dar bom contraste */
+}
+
+.navbar-dark .nav-link:hover {
+  color: #000 !important;
+}
+
+/* Opcional: ajusta o ícone de menu no celular para cor escura */
+.navbar-dark .navbar-toggler-icon {
+  filter: brightness(0.2);
+}
+
+
+/* .navbar .nav-link {
+    color: rgba(255, 255, 255, .88);
+}
+
+.navbar .nav-link:hover {
+    color: #fff;
+} */
+
+.card {
+    border: 0;
+    border-radius: 1rem;
+}
+
+.table> :not(caption)>*>* {
+    padding: .85rem;
+}
+
+.hero {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden; /* Evita vazamentos de layout */
+}
+
+.hero-image {
+  width: 100%;
+  /* O calc faz a imagem ocupar 100% da altura visível DESCONTANDO a barra do topo (ajuste os 56px se sua navbar for mais alta/baixa) */
+  height: calc(100vh - 56px); 
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.limit-box {
+    background: #edf6ff;
+    border: 1px solid #cfe5ff;
+}
+
+.whatsapp-qr {
+    width: min(320px, 100%);
+    height: auto;
+    border-radius: .75rem;
+    border: 1px solid #dee2e6;
+    padding: .5rem;
+    background: #fff;
+}
+
+footer {
+    background: #fff;
+}
+
+/* Ajustes visuais do Botão e Campos do Formulário */
+.btn-primary {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+  color: #fff;
+}
+
+.btn-primary:hover, 
+.btn-primary:focus, 
+.btn-primary:active {
+  background-color: var(--bs-primary-hover) !important;
+  border-color: var(--bs-primary-hover) !important;
+  color: #fff !important;
+}
+
+/* Cor de seleção do Checkbox e Borda dos Campos ao clicar */
+.form-check-input:checked {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+}
+
+.form-control:focus, 
+.form-check-input:focus {
+  border-color: var(--bs-primary);
+  box-shadow: 0 0 0 0.25rem rgba(232, 130, 165, 0.25); /* Brilho rosa ao selecionar o campo */
+}
+
+/* Torna o fundo do Card das tabelas num tom rosa bem suave */
+.table-responsive.card {
+  background-color: #fde8ed !important; /* Rosa suave */
+  border: none !important;
+}
+
+/* Faz com que a tabela herde o fundo rosa em vez de ficar branca */
+.table {
+  --bs-table-bg: transparent !important;
+  --bs-table-hover-bg: rgba(232, 130, 165, 0.15) !important; /* Efeito ao passar o mouse */
+}
+
+/* Cor do texto do cabeçalho da tabela */
+.table thead th {
+  color: #4a2e35;
+  border-bottom-color: #f8a5c2;
+}
+
+/* Borda rosa personalizada para formulários e cards */
+.borda-rosa {
+  border: 3px solid #e882a5 !important; /* 3px define a espessura da linha */
+  border-radius: 1rem;                  /* Mantém as pontas arredondadas elegantes */
+}
+
+/* Força todos os cards do site a usarem o fundo rosa e a borda rosa */
+.card {
+    background-color: #fde8ed !important; /* Tom rosa claro */
+    --bs-card-bg: #fde8ed !important;     /* Sobrescreve a variável do Bootstrap 5 */
+    border: 2px solid #e882a5 !important;  /* Aplica a borda rosa */
+}
+
+/* Deixa o fundo dos campos (inputs e selects) brancos para manter a legibilidade */
+.card .form-control, 
+.card .form-select {
+    background-color: #ffffff !important;
+}
+
+/* Transforma o azul da imagem em tom rosa/magenta */
+.imagem-rosa {
+  filter: hue-rotate(120deg) saturate(0.9);
+}

@@ -1,25 +1,39 @@
 {% extends "base.html" %}
 {% block title %}Novo usuário{% endblock %}
 {% block content %}
-<div class="row justify-content-center"><div class="col-lg-8">
-  <h1 class="h2 mb-3">Novo usuário</h1>
-  {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
-  <form method="post" class="card card-body shadow-sm">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-    <div class="row g-3">
-      <div class="col-md-6"><label class="form-label">Nome</label><input class="form-control" name="nome" value="{{ values.get('nome','') }}" required></div>
-      <div class="col-md-6"><label class="form-label">E-mail</label><input class="form-control" type="email" name="email" value="{{ values.get('email','') }}" required></div>
-      <div class="col-md-6"><label class="form-label">Telefone</label><input class="form-control" name="phone_number" value="{{ values.get('phone_number','') }}"></div>
-      <div class="col-md-6"><label class="form-label">RA</label><input class="form-control" name="ra" value="{{ values.get('ra','') }}"></div>
-      <div class="col-md-6"><label class="form-label">Perfil</label><select class="form-select" name="role" required>{% for role in choices %}<option value="{{ role }}" {% if values.get('role') == role %}selected{% endif %}>{{ role }}</option>{% endfor %}</select></div>
-      {% if is_admin %}
-      <div class="col-md-6 d-flex align-items-end"><div class="form-check mb-2"><input class="form-check-input" type="checkbox" name="pode_enviar_whatsapp" value="true" id="wa" {% if values.get('pode_enviar_whatsapp') %}checked{% endif %}><label class="form-check-label" for="wa">Pode enviar WhatsApp</label></div></div>
-      {% endif %}
-      <div class="col-md-6"><label class="form-label">Senha</label><input class="form-control" type="password" name="password" minlength="6" required></div>
-      <div class="col-md-6"><label class="form-label">Confirmar senha</label><input class="form-control" type="password" name="confirm_password" minlength="6" required></div>
-    </div>
-    <div class="mt-4"><button class="btn btn-primary" type="submit">Cadastrar</button> <a class="btn btn-outline-secondary" href="/account/users">Cancelar</a></div>
-  </form>
-</div></div>
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <h1 class="h2 mb-3">Novo usuário</h1>
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+    <form method="post" class="card card-body shadow-sm">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <div class="row g-3">
+        <div class="col-md-6"><label class="form-label">Nome</label><input class="form-control" name="nome"
+            value="{{ values.get('nome','') }}" required></div>
+        <div class="col-md-6"><label class="form-label">E-mail</label><input class="form-control" type="email"
+            name="email" value="{{ values.get('email','') }}" required></div>
+        <div class="col-md-6"><label class="form-label">Telefone</label><input class="form-control" name="phone_number"
+            value="{{ values.get('phone_number','') }}"></div>
+        <div class="col-md-6"><label class="form-label">RA</label><input class="form-control" name="ra"
+            value="{{ values.get('ra','') }}"></div>
+        <div class="col-md-6"><label class="form-label">Perfil</label><select class="form-select" name="role"
+            required>{% for role in choices %}<option value="{{ role }}" {% if values.get('role')==role %}selected{%
+              endif %}>{{ role }}</option>{% endfor %}</select></div>
+        {% if is_admin %}
+        <div class="col-md-6 d-flex align-items-end">
+          <div class="form-check mb-2"><input class="form-check-input" type="checkbox" name="pode_enviar_whatsapp"
+              value="true" id="wa" {% if values.get('pode_enviar_whatsapp') %}checked{% endif %}><label
+              class="form-check-label" for="wa">Pode enviar WhatsApp</label></div>
+        </div>
+        {% endif %}
+        <div class="col-md-6"><label class="form-label">Senha</label><input class="form-control" type="password"
+            name="password" minlength="6" required></div>
+        <div class="col-md-6"><label class="form-label">Confirmar senha</label><input class="form-control"
+            type="password" name="confirm_password" minlength="6" required></div>
+      </div>
+      <div class="mt-4"><button class="btn btn-primary" type="submit">Cadastrar</button> <a
+          class="btn btn-outline-secondary" href="/account/users">Cancelar</a></div>
+    </form>
+  </div>
+</div>
 {% endblock %}
-
