@@ -20,13 +20,15 @@
       <div class="collapse navbar-collapse" id="main-menu">
         <ul class="navbar-nav ms-auto align-items-xl-center">
           <li class="nav-item"><a class="nav-link" href="/alunos">Alunos</a></li>
-          <li class="nav-item"><a class="nav-link" href="/responsaveis">Responsáveis</a></li>
-          <li class="nav-item"><a class="nav-link" href="/compras">Compras</a></li>
-          <li class="nav-item"><a class="nav-link" href="/produtos">Produtos</a></li>
-          <li class="nav-item"><a class="nav-link" href="/vendas/new">Vendas</a></li>
-          <li class="nav-item"><a class="nav-link" href="/relatorios">Relatórios</a></li>
+          {% if is_admin or is_prop %}
+            <li class="nav-item"><a class="nav-link" href="/responsaveis">Responsáveis</a></li>
+            <li class="nav-item"><a class="nav-link" href="/compras">Compras</a></li>
+            <li class="nav-item"><a class="nav-link" href="/produtos">Produtos</a></li>
+            <li class="nav-item"><a class="nav-link" href="/vendas/new">Vendas</a></li>
+          {% endif %}
+            <li class="nav-item"><a class="nav-link" href="/relatorios">Relatórios</a></li>
           {% if can_whatsapp %}
-          <li class="nav-item"><a class="nav-link" href="/whatsapp">WhatsApp</a></li>
+            <li class="nav-item"><a class="nav-link" href="/whatsapp">WhatsApp</a></li>
           {% endif %}
           {% if is_admin or is_prop %}
           <li class="nav-item"><a class="nav-link" href="/account/users">Usuários</a></li>
