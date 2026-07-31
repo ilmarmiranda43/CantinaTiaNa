@@ -9,3 +9,4 @@ document.addEventListener("change", (event) => {
   if (phone) phone.disabled = Boolean(event.target.value);
 });
 
+document.getElementById('year').textContent = new Date().getFullYear();
