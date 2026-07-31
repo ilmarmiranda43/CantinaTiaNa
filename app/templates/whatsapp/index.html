@@ -119,7 +119,7 @@
         </thead>
         <tbody>
           {% for item in history %}<tr>
-            <td>{{ item.criado_em.strftime('%d/%m/%Y %H:%M') }}</td>
+            <td>{{ item.criado_em_local.strftime('%d/%m/%Y %H:%M') }}</td>
             <td>{{ item.responsavel.nome if item.responsavel else 'Telefone informado' }}</td>
             <td>{{ item.telefone }}</td>
             <td>{{ item.usuario_nome }}</td>

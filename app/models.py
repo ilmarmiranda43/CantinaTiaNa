@@ -17,6 +17,8 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from zoneinfo import ZoneInfo
+
 from app.database import Base
 
 
@@ -202,9 +204,16 @@ class WhatsAppMensagem(Base):
     status: Mapped[str] = mapped_column("Status", String(30), default="Pendente")
     message_id: Mapped[str | None] = mapped_column("MessageId", String(255))
     detalhes_erro: Mapped[str | None] = mapped_column("DetalhesErro", String(1000))
-    criado_em: Mapped[datetime] = mapped_column(
-        "CriadoEm", DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    criado_em: Mapped[datetime] = mapped_column("CriadoEm", DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )
+
+    @property
+    def criado_em_local(self) -> datetime:
+        if self.criado_em:
+            # Converte de UTC para o fuso de São Paulo (UTC-3)
+            return self.criado_em.astimezone(ZoneInfo("America/Sao_Paulo"))
+        return self.criado_em
+
     enviado_em: Mapped[datetime | None] = mapped_column("EnviadoEm", DateTime(timezone=True))
 
     usuario: Mapped[User | None] = relationship()
