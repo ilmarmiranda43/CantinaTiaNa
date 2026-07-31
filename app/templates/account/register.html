@@ -19,7 +19,7 @@
         <div class="col-md-6"><label class="form-label">Perfil</label><select class="form-select" name="role"
             required>{% for role in choices %}<option value="{{ role }}" {% if values.get('role')==role %}selected{%
               endif %}>{{ role }}</option>{% endfor %}</select></div>
-        {% if is_admin %}
+        {% if is_admin or is_prop %}
         <div class="col-md-6 d-flex align-items-end">
           <div class="form-check mb-2"><input class="form-check-input" type="checkbox" name="pode_enviar_whatsapp"
               value="true" id="wa" {% if values.get('pode_enviar_whatsapp') %}checked{% endif %}><label

@@ -18,7 +18,7 @@
             value="{{ target.ra }}"></div>
         <div class="col-md-6"><label class="form-label">Perfil</label><input class="form-control"
             value="{{ target_roles|join(', ') }}" disabled></div>
-        {% if is_admin %}
+        {% if is_admin or is_prop %}
         <div class="col-md-6 d-flex align-items-end">
           <div class="form-check mb-2"><input class="form-check-input" type="checkbox" name="pode_enviar_whatsapp"
               value="true" id="wa" {% if target.pode_enviar_whatsapp or 'Admin' in target_roles %}checked{% endif %} {%
