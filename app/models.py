@@ -111,6 +111,7 @@ class Produto(Base):
     data_cadastro: Mapped[datetime] = mapped_column(
         "DataCadastro", DateTime(timezone=False), default=datetime.now
     )
+    codigo_barras: Mapped[str | None] = mapped_column("CodigoBarras",String(50),nullable=True,unique=True)
 
 
 class Compra(Base):

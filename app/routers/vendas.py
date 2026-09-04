@@ -39,20 +39,37 @@ def _month_limits(now: datetime) -> tuple[datetime, datetime]:
 
 
 def _limit_info(db: Session, aluno: Aluno) -> dict[str, Decimal]:
-    start, end = _month_limits(datetime.now())
-    consumed = db.scalar(
-        select(func.coalesce(func.sum(Compra.valor_total), 0)).where(
+
+    pendente = db.scalar(
+        select(
+            func.coalesce(
+                func.sum(Compra.valor_total),
+                0
+            )
+        ).where(
             Compra.aluno_id == aluno.id,
-            Compra.data >= start,
-            Compra.data < end,
+            Compra.status == "PENDENTE"
         )
     )
-    limit = aluno.responsavel.valor_para_cantina if aluno.responsavel else Decimal("0")
-    consumed = Decimal(consumed or 0)
+
+    limite = (
+        aluno.responsavel.valor_para_cantina
+        if aluno.responsavel
+        else Decimal("0")
+    )
+
+    limite = Decimal(limite or 0)
+    pendente = Decimal(pendente or 0)
+
+    disponivel = max(
+        Decimal("0"),
+        limite - pendente
+    )
+
     return {
-        "limite": limit,
-        "consumido": consumed,
-        "disponivel": max(Decimal("0"), limit - consumed),
+        "limite": limite,
+        "pendente": pendente,
+        "disponivel": disponivel,
     }
 
 
@@ -129,7 +146,7 @@ async def create(
             limits=limits,
             error=error,
         )
-    compra = Compra(aluno_id=aluno.id, data=datetime.now(), valor_total=total)
+    compra = Compra(aluno_id=aluno.id, data=datetime.now(), valor_total=total, status="PENDENTE")
     compra.itens = [
         CompraItem(
             produto_id=pid,
@@ -150,19 +167,37 @@ def limit(
     db: Session = Depends(get_db),
     user=Depends(require_user),
 ):
+
     own = _own_student(db, user.id)
+
     if own and own.id != aluno_id:
         raise AccessDenied()
+
     aluno = db.scalar(
-        select(Aluno).options(joinedload(Aluno.responsavel)).where(Aluno.id == aluno_id)
+        select(Aluno)
+        .options(joinedload(Aluno.responsavel))
+        .where(Aluno.id == aluno_id)
     )
+
     if not aluno:
-        return JSONResponse({"limite": 0, "consumidoMes": 0, "disponivel": 0})
+        return JSONResponse({
+            "limite": 0,
+            "pendente": 0,
+            "consumidoMes": 0,
+            "disponivel": 0,
+        })
+
     info = _limit_info(db, aluno)
+
     return JSONResponse(
         {
             "limite": float(info["limite"]),
-            "consumidoMes": float(info["consumido"]),
+
+            "pendente": float(info["pendente"]),
+
+            # Mantemos temporariamente para o JS antigo
+            "consumidoMes": float(info["pendente"]),
+
             "disponivel": float(info["disponivel"]),
         }
     )

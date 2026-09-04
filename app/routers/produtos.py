@@ -35,17 +35,25 @@ def create_form(request: Request, _=Depends(require_roles("Admin", "Prop"))):
     return _render(request, "produtos/form.html", item=None, error=None)
 
 
-def _apply(item: Produto, nome: str, preco: str, quantidade: int, categoria: str) -> str | None:
+def _apply(item: Produto,nome: str,preco: str,quantidade: int,categoria: str,codigo_barras: str) -> str | None:
+
     try:
         price = parse_decimal(preco)
+
     except InvalidOperation:
         return "Informe um preço válido."
+
     if not nome.strip() or price < 0 or quantidade < 0:
         return "Preencha os dados do produto com valores válidos."
+
     item.nome = nome.strip()
     item.preco = price
     item.quantidade = quantidade
     item.categoria = categoria.strip() or None
+
+    # Código de barras
+    item.codigo_barras = codigo_barras.strip() or None
+
     return None
 
 
@@ -56,14 +64,36 @@ async def create(
     preco: str = Form(...),
     quantidade: int = Form(0),
     categoria: str = Form(""),
+
+    codigo_barras: str = Form(""),
+
     db: Session = Depends(get_db),
+
     _user=Depends(require_roles("Admin", "Prop")),
     _=Depends(require_csrf),
 ):
     item = Produto(nome="", preco=Decimal("0"), quantidade=0, data_cadastro=datetime.now())
-    error = _apply(item, nome, preco, quantidade, categoria)
+    error = _apply(item, nome, preco, quantidade, categoria, codigo_barras)
     if error:
         return _render(request, "produtos/form.html", item=item, error=error)
+
+    if codigo_barras.strip():
+
+        produto_existente = db.scalar(
+            select(Produto).where(
+                Produto.codigo_barras == codigo_barras.strip()
+            )
+        )
+
+        if produto_existente:
+
+            return _render(
+                request,
+                "produtos/form.html",
+                item=item,
+                error="Já existe um produto cadastrado com este código de barras."
+            )
+
     db.add(item)
     db.commit()
     return RedirectResponse("/produtos", status_code=303)
@@ -86,22 +116,74 @@ def edit_form(
 async def edit(
     item_id: int,
     request: Request,
+
     nome: str = Form(...),
     preco: str = Form(...),
     quantidade: int = Form(0),
     categoria: str = Form(""),
+    codigo_barras: str = Form(""),
+
     db: Session = Depends(get_db),
     _user=Depends(require_roles("Admin", "Prop")),
     _=Depends(require_csrf),
 ):
+
     item = db.get(Produto, item_id)
+
     if not item:
-        return RedirectResponse("/produtos", status_code=303)
-    error = _apply(item, nome, preco, quantidade, categoria)
+        return RedirectResponse(
+            "/produtos",
+            status_code=303
+        )
+
+    error = _apply(
+        item,
+        nome,
+        preco,
+        quantidade,
+        categoria,
+        codigo_barras
+    )
+
     if error:
-        return _render(request, "produtos/form.html", item=item, error=error)
+        return _render(
+            request,
+            "produtos/form.html",
+            item=item,
+            error=error
+        )
+
+
+    # Verifica se o código pertence
+    # a OUTRO produto
+    if codigo_barras.strip():
+
+        produto_existente = db.scalar(
+            select(Produto).where(
+                Produto.codigo_barras == codigo_barras.strip(),
+                Produto.id != item.id
+            )
+        )
+
+        if produto_existente:
+
+            return _render(
+                request,
+                "produtos/form.html",
+                item=item,
+                error=(
+                    "Já existe outro produto cadastrado "
+                    "com este código de barras."
+                )
+            )
+
+
     db.commit()
-    return RedirectResponse("/produtos", status_code=303)
+
+    return RedirectResponse(
+        "/produtos",
+        status_code=303
+    )
 
 
 @router.post("/{item_id}/delete")

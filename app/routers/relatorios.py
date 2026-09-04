@@ -40,8 +40,13 @@ def balances(request: Request, db: Session = Depends(get_db), user=Depends(requi
     for aluno in db.scalars(query).all():
         consumed = Decimal(
             db.scalar(
-                select(func.coalesce(func.sum(Compra.valor_total), 0)).where(
-                    Compra.aluno_id == aluno.id, Compra.data >= start, Compra.data < end
+                select(
+                    func.coalesce(
+                        func.sum(Compra.valor_total), 0
+                    )
+                ).where(
+                    Compra.aluno_id == aluno.id,
+                    Compra.status == "PENDENTE"
                 )
             )
             or 0

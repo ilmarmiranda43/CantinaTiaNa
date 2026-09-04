@@ -91,7 +91,7 @@
       if (!response.ok) return;
       const data = await response.json();
       document.querySelector('#available').textContent = money(data.disponivel);
-      document.querySelector('#limit-detail').textContent = `Limite ${money(data.limite)} · consumido ${money(data.consumidoMes)}`;
+      document.querySelector('#limit-detail').textContent = `Limite ${money(data.limite)} · consumido ${money(data.pendente)}`;
     });
     add();
   })();

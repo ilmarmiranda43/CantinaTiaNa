@@ -1,27 +1,343 @@
 {% extends "base.html" %}
-{% block title %}{{ 'Editar' if item and item.id else 'Novo' }} produto{% endblock %}
+
+{% block title %}
+{{ 'Editar' if item and item.id else 'Novo' }} produto
+{% endblock %}
+
+
 {% block content %}
+
 <div class="row justify-content-center">
-    <div class="col-lg-8">
-        <h1 class="h2 mb-3">{{ 'Editar' if item and item.id else 'Novo' }} produto</h1>
-        {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
-        <form method="post" class="card card-body shadow-sm"><input type="hidden" name="csrf_token"
-                value="{{ csrf_token }}">
-            <div class="row g-3">
-                <div class="col-md-7"><label class="form-label">Nome</label><input class="form-control" name="nome"
-                        maxlength="120" value="{{ item.nome if item else '' }}" required></div>
-                <div class="col-md-5"><label class="form-label">Categoria</label><input class="form-control"
-                        name="categoria" maxlength="80" value="{{ item.categoria if item and item.categoria else '' }}">
+
+        <div class="col-lg-8">
+
+                <h1 class="h2 mb-3">
+                        {{ 'Editar' if item and item.id else 'Novo' }} produto
+                </h1>
+
+
+                {% if error %}
+                <div class="alert alert-danger">
+                        {{ error }}
                 </div>
-                <div class="col-md-6"><label class="form-label">Preço</label><input class="form-control" name="preco"
-                        inputmode="decimal" value="{{ item.preco if item else '' }}" required></div>
-                <div class="col-md-6"><label class="form-label">Quantidade</label><input class="form-control"
-                        type="number" min="0" name="quantidade" value="{{ item.quantidade if item else 0 }}" required>
-                </div>
-            </div>
-            <div class="mt-4"><button class="btn btn-primary">Salvar</button> <a class="btn btn-outline-secondary"
-                    href="/produtos">Cancelar</a></div>
-        </form>
-    </div>
+                {% endif %}
+
+
+                <form method="post" class="card card-body shadow-sm">
+
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+
+                        <div class="row g-3">
+
+                                <!-- CÓDIGO DE BARRAS -->
+                                <div class="col-md-12">
+
+                                        <label for="codigo_barras" class="form-label">
+                                                Código de barras
+                                        </label>
+
+
+                                        <div class="input-group">
+
+                                                <input type="text" class="form-control" id="codigo_barras"
+                                                        name="codigo_barras" maxlength="50" inputmode="numeric"
+                                                        placeholder="Digite ou leia o código de barras"
+                                                        value="{{ item.codigo_barras if item and item.codigo_barras else '' }}">
+
+
+                                                <button type="button" class="btn btn-outline-primary" id="btnScanner">
+                                                        📷 Ler código
+                                                </button>
+
+                                        </div>
+
+                                        <div class="form-text">
+                                                No celular, toque em "Ler código" e aponte
+                                                a câmera para o código de barras do produto.
+                                        </div>
+
+                                </div>
+
+
+                                <!-- ÁREA DO SCANNER -->
+                                <div class="col-12" id="scannerContainer" style="display: none;">
+
+                                        <div class="card">
+
+                                                <div
+                                                        class="card-header d-flex justify-content-between align-items-center">
+
+                                                        <strong>
+                                                                📷 Leitor de código de barras
+                                                        </strong>
+
+                                                        <button type="button" class="btn-close"
+                                                                id="btnFecharScannerTopo" aria-label="Fechar"></button>
+
+                                                </div>
+
+
+                                                <div class="card-body">
+
+                                                        <div id="reader" style="width: 100%;"></div>
+
+
+                                                        <div class="text-center mt-3">
+
+                                                                <small class="text-muted">
+                                                                        Posicione o código de barras
+                                                                        dentro da área da câmera.
+                                                                </small>
+
+                                                        </div>
+
+
+                                                        <div class="text-center mt-3">
+
+                                                                <button type="button" class="btn btn-outline-secondary"
+                                                                        id="btnFecharScanner">
+                                                                        Fechar câmera
+                                                                </button>
+
+                                                        </div>
+
+                                                </div>
+
+                                        </div>
+
+                                </div>
+
+
+                                <!-- NOME -->
+                                <div class="col-md-7">
+
+                                        <label class="form-label">
+                                                Nome
+                                        </label>
+
+                                        <input class="form-control" name="nome" maxlength="120"
+                                                value="{{ item.nome if item else '' }}" required>
+
+                                </div>
+
+
+                                <!-- CATEGORIA -->
+                                <div class="col-md-5">
+
+                                        <label class="form-label">
+                                                Categoria
+                                        </label>
+
+                                        <input class="form-control" name="categoria" maxlength="80"
+                                                value="{{ item.categoria if item and item.categoria else '' }}">
+
+                                </div>
+
+
+
+
+
+                                <!-- PREÇO -->
+                                <div class="col-md-6">
+
+                                        <label class="form-label">
+                                                Preço
+                                        </label>
+
+                                        <input class="form-control" name="preco" inputmode="decimal"
+                                                value="{{ item.preco if item else '' }}" required>
+
+                                </div>
+
+
+                                <!-- QUANTIDADE -->
+                                <div class="col-md-6">
+
+                                        <label class="form-label">
+                                                Quantidade
+                                        </label>
+
+                                        <input class="form-control" type="number" min="0" name="quantidade"
+                                                value="{{ item.quantidade if item else 0 }}" required>
+
+                                </div>
+
+                        </div>
+
+
+                        <div class="mt-4">
+
+                                <button class="btn btn-primary" type="submit">
+                                        Salvar
+                                </button>
+
+                                <a class="btn btn-outline-secondary" href="/produtos">
+                                        Cancelar
+                                </a>
+
+                        </div>
+
+                </form>
+
+        </div>
+
 </div>
+
+
+<!-- Biblioteca para leitura de código de barras -->
+<script src="https://unpkg.com/html5-qrcode"></script>
+
+
+<script>
+
+        let scanner = null;
+        let scannerAtivo = false;
+
+
+        const btnScanner =
+                document.getElementById("btnScanner");
+
+        const btnFecharScanner =
+                document.getElementById("btnFecharScanner");
+
+        const btnFecharScannerTopo =
+                document.getElementById("btnFecharScannerTopo");
+
+        const scannerContainer =
+                document.getElementById("scannerContainer");
+
+        const codigoInput =
+                document.getElementById("codigo_barras");
+
+
+        // --------------------------------------------------
+        // ABRIR CÂMERA
+        // --------------------------------------------------
+
+        btnScanner.addEventListener(
+                "click",
+                async function () {
+
+                        scannerContainer.style.display = "block";
+
+                        scanner = new Html5Qrcode("reader");
+
+                        try {
+
+                                await scanner.start(
+
+                                        {
+                                                facingMode: "environment"
+                                        },
+
+                                        {
+                                                fps: 10,
+
+                                                qrbox: {
+                                                        width: 280,
+                                                        height: 120
+                                                }
+                                        },
+
+                                        async function (decodedText) {
+
+                                                // Coloca o código no input
+                                                codigoInput.value = decodedText;
+
+
+                                                // Vibra o celular
+                                                if (navigator.vibrate) {
+                                                        navigator.vibrate(150);
+                                                }
+
+
+                                                // Fecha a câmera
+                                                await pararScanner();
+
+
+                                                // Coloca foco no campo
+                                                codigoInput.focus();
+
+                                        },
+
+                                        function (errorMessage) {
+                                                // Ignoramos erros enquanto
+                                                // procura o código.
+                                        }
+
+                                );
+
+                                scannerAtivo = true;
+
+                        }
+                        catch (erro) {
+
+                                console.error(
+                                        "Erro ao iniciar câmera:",
+                                        erro
+                                );
+
+                                scannerContainer.style.display = "none";
+
+                                alert(
+                                        "Não foi possível acessar a câmera. " +
+                                        "Verifique se o navegador possui permissão."
+                                );
+
+                        }
+
+                }
+        );
+
+
+        // --------------------------------------------------
+        // FECHAR CÂMERA
+        // --------------------------------------------------
+
+        async function pararScanner() {
+
+                try {
+
+                        if (scanner && scannerAtivo) {
+
+                                await scanner.stop();
+
+                                scanner.clear();
+
+                        }
+
+                }
+                catch (erro) {
+
+                        console.log(
+                                "Erro ao fechar scanner:",
+                                erro
+                        );
+
+                }
+
+                scannerAtivo = false;
+
+                scanner = null;
+
+                scannerContainer.style.display = "none";
+
+        }
+
+
+        btnFecharScanner.addEventListener(
+                "click",
+                pararScanner
+        );
+
+
+        btnFecharScannerTopo.addEventListener(
+                "click",
+                pararScanner
+        );
+
+</script>
+
+
 {% endblock %}
