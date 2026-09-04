@@ -1,34 +1,225 @@
 {% extends "base.html" %}
+
 {% block title %}Compras{% endblock %}
+
 {% block content %}
+
 <div class="container py-4">
+
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1 class="h2 mb-0">Compras</h1>{% if is_admin or is_prop %}<a class="btn btn-primary"
-            href="/compras/new">Lançamento simples</a>{% endif %}
+
+        <h1 class="h2 mb-0">Compras</h1>
+
+        {% if is_admin or is_prop %}
+        <a class="btn btn-primary" href="/compras/new">
+            Lançamento simples
+        </a>
+        {% endif %}
+
     </div>
+
     <div class="table-responsive card shadow-sm">
+
         <table class="table table-hover align-middle mb-0">
+
             <thead>
                 <tr>
                     <th>Data</th>
                     <th>Aluno</th>
                     <th>Total</th>
+                    <th>Status</th>
+                    <th>Ação</th>
                     <th></th>
                 </tr>
             </thead>
+
             <tbody>
-                {% for item in items %}<tr>
-                    <td>{{ item.data.strftime('%d/%m/%Y %H:%M') }}</td>
-                    <td>{{ item.aluno.nome }}</td>
-                    <td>{{ item.valor_total|brl }}</td>
-                    <td class="text-end"><a class="btn btn-sm btn-outline-primary"
-                            href="/compras/{{ item.id }}">Detalhes</a></td>
-                </tr>{% else %}<tr>
-                    <td colspan="4" class="text-center text-muted py-4">Nenhuma compra registrada.</td>
-                </tr>{% endfor %}
+
+                {% for item in items %}
+
+                <tr>
+
+                    <!-- DATA -->
+                    <td>
+                        {{ item.data.strftime('%d/%m/%Y %H:%M') }}
+                    </td>
+
+                    <!-- ALUNO -->
+                    <td>
+                        {{ item.aluno.nome }}
+                    </td>
+
+                    <!-- TOTAL -->
+                    <td>
+                        {{ item.valor_total|brl }}
+                    </td>
+
+                    <!-- STATUS -->
+                    <td>
+
+                        {% if item.status == "PAGO" %}
+
+                        <span class="badge bg-success">
+                            ✓ Pago
+                        </span>
+
+                        {% else %}
+
+                        <span class="badge bg-warning text-dark">
+                            Pendente
+                        </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <!-- AÇÃO PAGAMENTO -->
+                    <td>
+
+                        {% if item.status != "PAGO" %}
+
+                        <form method="post" action="/compras/{{ item.id }}/pagar" class="d-inline">
+
+                            <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal"
+                                data-bs-target="#modalPagamento" data-compra-id="{{ item.id }}"
+                                data-aluno="{{ item.aluno.nome }}" data-valor="{{ item.valor_total|brl }}">
+                                Marcar como pago
+                            </button>
+
+                        </form>
+
+                        {% else %}
+
+                        <span class="text-success">
+                            Pagamento realizado
+                        </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <!-- DETALHES -->
+                    <td class="text-end">
+
+                        <a class="btn btn-sm btn-outline-primary" href="/compras/{{ item.id }}">
+                            Detalhes
+                        </a>
+
+                    </td>
+
+                </tr>
+
+                {% else %}
+
+                <tr>
+                    <td colspan="6" class="text-center text-muted py-4">
+                        Nenhuma compra registrada.
+                    </td>
+                </tr>
+
+                {% endfor %}
+
             </tbody>
+
         </table>
+
+    </div>
+
+</div>
+
+<!-- MODAL: coloque aqui, depois do container -->
+<div class="modal fade" id="modalPagamento" tabindex="-1" aria-labelledby="modalPagamentoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title" id="modalPagamentoLabel">
+                    Confirmar pagamento
+                </h5>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <p>Confirma o pagamento desta compra?</p>
+
+                <div class="bg-light rounded p-3">
+
+                    <div>
+                        <strong>Aluno:</strong>
+                        <span id="modalAluno"></span>
+                    </div>
+
+                    <div class="mt-2">
+                        <strong>Valor:</strong>
+                        <span id="modalValor" class="text-success fw-bold"></span>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Cancelar
+                </button>
+
+                <form id="formPagamento" method="post">
+
+                    <button type="submit" class="btn btn-success">
+                        ✓ Confirmar pagamento
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
     </div>
 </div>
+
+
+<script>
+
+    const modalPagamento =
+        document.getElementById("modalPagamento");
+
+    modalPagamento.addEventListener(
+        "show.bs.modal",
+        function (event) {
+
+            const button = event.relatedTarget;
+
+            const compraId =
+                button.getAttribute("data-compra-id");
+
+            const aluno =
+                button.getAttribute("data-aluno");
+
+            const valor =
+                button.getAttribute("data-valor");
+
+            document.getElementById(
+                "modalAluno"
+            ).textContent = aluno;
+
+            document.getElementById(
+                "modalValor"
+            ).textContent = valor;
+
+            document.getElementById(
+                "formPagamento"
+            ).action =
+                `/compras/${compraId}/pagar`;
+        }
+    );
+
+</script>
 
 {% endblock %}

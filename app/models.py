@@ -120,6 +120,8 @@ class Compra(Base):
     aluno_id: Mapped[int] = mapped_column("AlunoId", ForeignKey("Alunos.Id", ondelete="RESTRICT"))
     data: Mapped[datetime] = mapped_column("Data", DateTime(timezone=False), default=datetime.now)
     valor_total: Mapped[Decimal] = mapped_column("ValorTotal", Numeric(18, 2))
+    status: Mapped[str] = mapped_column("Status",String(20),nullable=False,default="PENDENTE")
+
 
     aluno: Mapped[Aluno] = relationship(back_populates="compras")
     itens: Mapped[list["CompraItem"]] = relationship(

@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from decimal import Decimal, InvalidOperation
 
-from fastapi import APIRouter, Depends, Form, Request
+from fastapi import APIRouter, Depends, Form, Request, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session, joinedload, selectinload
@@ -100,3 +100,25 @@ def details(
     if student and item.aluno_id != student.id:
         raise AccessDenied()
     return _render(request, "compras/details.html", item=item)
+
+@router.post("/{compra_id}/pagar")
+def marcar_como_pago(
+    compra_id: int,
+    db: Session = Depends(get_db)
+):
+    compra = db.get(Compra, compra_id)
+
+    if not compra:
+        raise HTTPException(
+            status_code=404,
+            detail="Compra não encontrada"
+        )
+
+    compra.status = "PAGO"
+
+    db.commit()
+
+    return RedirectResponse(
+        url=f"/compras",
+        status_code=303
+    )
